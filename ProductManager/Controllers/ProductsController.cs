@@ -34,7 +34,17 @@ public class ProductsController : Controller
 
         TempData["Success"] = "Producto registrado correctamente.";
 
-        return RedirectToAction(nameof(Create));
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Index()
+    {
+        var products = await _context.Products
+            .OrderBy(product => product.Name)
+            .ToListAsync();
+
+        return View(products);
     }
 
     [HttpGet]
