@@ -14,15 +14,6 @@ public class ProductsController : Controller
         _context = context;
     }
 
-    [HttpGet]
-    public async Task<IActionResult> Index()
-    {
-        var products = await _context.Products
-            .OrderBy(product => product.Name)
-            .ToListAsync();
-
-        return View(products);
-    }
 
     [HttpGet]
     public IActionResult Create()
