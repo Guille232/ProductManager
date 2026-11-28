@@ -37,6 +37,13 @@
     </div>
 </form>
 
+@if (!Model.Any())
+{
+    <div class="alert alert-info">
+        No se encontraron productos.
+    </div>
+}
+
 <table class="table table-striped table-bordered">
     <thead>
         <tr>
