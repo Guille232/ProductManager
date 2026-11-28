@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using ProductManager.Data;
 using ProductManager.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace ProductManager.Controllers;
 
@@ -12,6 +12,16 @@ public class ProductsController : Controller
     public ProductsController(AppDbContext context)
     {
         _context = context;
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Index()
+    {
+        var products = await _context.Products
+            .OrderBy(product => product.Name)
+            .ToListAsync();
+
+        return View(products);
     }
 
     [HttpGet]
@@ -34,16 +44,48 @@ public class ProductsController : Controller
 
         TempData["Success"] = "Producto registrado correctamente.";
 
-        return RedirectToAction(nameof(Create));
+        return RedirectToAction(nameof(Index));
     }
 
     [HttpGet]
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Edit(int id)
     {
-        var products = await _context.Products
-            .OrderBy(product => product.Name)
-            .ToListAsync();
+        var product = await _context.Products.FindAsync(id);
 
-        return View(products);
+        if (product == null)
+        {
+            return NotFound();
+        }
+
+        return View(product);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(int id, Product product)
+    {
+        if (!ModelState.IsValid)
+        {
+            product.Id = id;
+            return View(product);
+        }
+
+        var existingProduct = await _context.Products.FindAsync(id);
+
+        if (existingProduct == null)
+        {
+            return NotFound();
+        }
+
+        existingProduct.Name = product.Name;
+        existingProduct.Description = product.Description;
+        existingProduct.Price = product.Price;
+        existingProduct.Quantity = product.Quantity;
+
+        await _context.SaveChangesAsync();
+
+        TempData["Success"] = "Producto actualizado correctamente.";
+
+        return RedirectToAction(nameof(Index));
     }
 }
