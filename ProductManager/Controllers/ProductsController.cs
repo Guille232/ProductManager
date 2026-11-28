@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using ProductManager.Data;
 using ProductManager.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace ProductManager.Controllers;
 
@@ -12,6 +12,16 @@ public class ProductsController : Controller
     public ProductsController(AppDbContext context)
     {
         _context = context;
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Index()
+    {
+        var products = await _context.Products
+            .OrderBy(product => product.Name)
+            .ToListAsync();
+
+        return View(products);
     }
 
     [HttpGet]
@@ -35,25 +45,5 @@ public class ProductsController : Controller
         TempData["Success"] = "Producto registrado correctamente.";
 
         return RedirectToAction(nameof(Index));
-    }
-
-    [HttpGet]
-    public async Task<IActionResult> Index()
-    {
-        var products = await _context.Products
-            .OrderBy(product => product.Name)
-            .ToListAsync();
-
-        return View(products);
-    }
-
-    [HttpGet]
-    public async Task<IActionResult> Index()
-    {
-        var products = await _context.Products
-            .OrderBy(product => product.Name)
-            .ToListAsync();
-
-        return View(products);
     }
 }
