@@ -59,4 +59,33 @@ public class ProductsController : Controller
 
         return View(product);
     }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(int id, Product product)
+    {
+        if (!ModelState.IsValid)
+        {
+            product.Id = id;
+            return View(product);
+        }
+
+        var existingProduct = await _context.Products.FindAsync(id);
+
+        if (existingProduct == null)
+        {
+            return NotFound();
+        }
+
+        existingProduct.Name = product.Name;
+        existingProduct.Description = product.Description;
+        existingProduct.Price = product.Price;
+        existingProduct.Quantity = product.Quantity;
+
+        await _context.SaveChangesAsync();
+
+        TempData["Success"] = "Producto actualizado correctamente.";
+
+        return RedirectToAction(nameof(Index));
+    }
 }
