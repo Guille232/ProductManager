@@ -121,4 +121,24 @@ public class ProductsController : Controller
 
         return RedirectToAction(nameof(Index));
     }
+
+    [HttpGet]
+    public async Task<IActionResult> Index(string? search)
+    {
+        var query = _context.Products.AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            query = query.Where(product =>
+                product.Name.Contains(search));
+        }
+
+        var products = await query
+            .OrderBy(product => product.Name)
+            .ToListAsync();
+
+        ViewData["Search"] = search;
+
+        return View(products);
+    }
 }
